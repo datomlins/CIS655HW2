@@ -73,11 +73,33 @@ public class Hardware
 	 * @param r3 The second register being added
 	 * @return 1 if successful, else 0
 	 */
-	private int addRegisters(int r1_idx, int r2_idx, int r3_idx)
+	private int add(Operand op1, Operand op2, Operand op3)
 	{
 		try 
 		{
-			registers[r1_idx] = registers[r2_idx] + registers[r3_idx];
+			int destRegisterIdx = op1.getValue();
+			int op2Val, op3Val;
+			
+			if (op2.getType() == 0)
+			{
+				op2Val = registers[op2.getValue()];
+			}
+			else 
+			{
+				op2Val = op2.getValue();
+			}
+			
+			if (op3.getType() == 0)
+			{
+				op3Val = registers[op3.getValue()];
+			}
+			else
+			{
+				op3Val = op3.getValue();
+			}
+			
+			registers[destRegisterIdx] = op2Val + op3Val;
+			
 			return 1;
 		}
 		catch (Exception e)
@@ -92,12 +114,39 @@ public class Hardware
 	 * @param r2
 	 * @return the content of r2 subtracted from the content of r1
 	 */
-	private int subRegisters(String r1, String r2)
+	private int sub(Operand op1, Operand op2, Operand op3)
 	{
-		int r1_num = registerMap.get(r1);
-		int r2_num = registerMap.get(r2);
-		
-		return (registers[r1_num] - registers[r2_num]);
+		try 
+		{
+			int destRegisterIdx = op1.getValue();
+			int op2Val, op3Val;
+			
+			if (op2.getType() == 0)
+			{
+				op2Val = registers[op2.getValue()];
+			}
+			else 
+			{
+				op2Val = op2.getValue();
+			}
+			
+			if (op3.getType() == 0)
+			{
+				op3Val = registers[op3.getValue()];
+			}
+			else
+			{
+				op3Val = op3.getValue();
+			}
+			
+			registers[destRegisterIdx] = op2Val - op3Val;
+			
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return 0;
+		}
 	}
 
 	/**
@@ -278,7 +327,7 @@ public class Hardware
 				return 0;
 			}
 			
-			this.load(op1, op2);
+			return this.load(op1, op2);
 		}
 		else if (operation.equals("store"))
 		{
@@ -288,12 +337,54 @@ public class Hardware
 				return 0;
 			}
 			
-			this.store(op1, op2);
+			return this.store(op1, op2);
 		}
 		else
 		{
-			op3 = parseOperand(instString[3]);
+			if (op1.getType() != 0)
+			{
+				return 0;
+			}
 			
+			op3 = parseOperand(instString[3]);		
+			
+			// call the appropriate function based on the operation
+			if (operation.equals("add"))
+			{
+				return this.add(op1, op2, op3);
+			}
+			else if (operation.equals("sub"))
+			{
+				return this.sub(op1, op2, op3);
+			}
+			else if (operation.equals("shiftl"))
+			{
+				
+			}
+			else if (operation.equals("shiftr"))
+			{
+				
+			}
+			else if (operation.equals("or"))
+			{
+				
+			}
+			else if (operation.equals("xor"))
+			{
+				
+			}
+			else if (operation.equals("and"))
+			{
+				
+			}
+			else if (operation.equals("weave"))
+			{
+				
+			}
+			else
+			{
+				return 0;
+			}
 		}
 		
 		return 0;
