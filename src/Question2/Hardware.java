@@ -519,20 +519,45 @@ public class Hardware
 		return (new Operand(value, 0));
 	}
 	
+	/** 
+	 * Prints the contents of the registers
+	 */
+	public void printRegisters()
+	{
+		for (int i = 0; i < registerNames.length; i++)
+		{
+			System.out.print(registerNames[i] + ":" + 
+								registers[registerMap.get(registerNames[i])] + "; ");
+		}
+		
+		System.out.println();
+	}
+	
 	public void testOr()
 	{
+		System.out.println("Pre-op:");
+		printRegisters();
 		registers[0] = 4;
 		registers[1] = 1;
-		System.out.println("4 | 1 = " + this.or("r1", "r2"));
+		System.out.println("Checking 4|1...");
+		Operand op1 = new Operand(0, 0);
+		Operand op2 = new Operand(1, 0);
+		Operand op3 = new Operand(2, 0);
+		this.or(op3, op1, op2);
+		System.out.println("Post-op:");
+		printRegisters(); // should be 5 in r3
 		
+		System.out.println("Checking 4|16...");
 		registers[2] = 16;
-		System.out.println("4 | 16 = " + this.or("r1", "r3"));
+		this.or(op2, op1, op3);
+		System.out.println("Post-op:");
+		printRegisters(); // should be 20 in r2
 		
-		System.out.println("? | ?? = " + this.or("r4", "r5"));
-		
-		System.out.println("Not an or:");
+		System.out.println("7 `crazy` 0");
 		registers[0] = 7;
 		registers[1] = 0;
-		System.out.println("7 `crazy` 0 = " + Integer.toBinaryString(this.crazy("r1", "r2")));
+		this.crazy(op3, op1, op2);
+		System.out.println("Post-op:");
+		printRegisters(); // should be 42 in r3
 	}
 }
