@@ -12,6 +12,46 @@ public class Hardware
 	private static final int REGISTER_SIZE = 32; // TODO - maybe just get rid of this
 	private static final int MEMORY_SIZE = 1024;
 	
+	class Operand
+	{
+		private int value; 
+		private int type; // 0 for register, 1 for literal (i.e. an int)
+		
+		/**
+		 * Constructs an operand for use in parsing
+		 * @param val The value of the operand - a literal or the register index
+		 * @param type The type of the operand - 0 for a register index; 1 for a literal
+		 */
+		public Operand(int val, int type)
+		{
+			if (type != 0 && type != 1)
+			{
+				throw new IllegalArgumentException();
+			}
+			
+			this.value = val;
+			this.type = type;
+		}
+		
+		/**
+		 * Returns the value of "value"
+		 * @return The value of the operand - an index if a register index; else a literal
+		 */
+		public int getValue()
+		{
+			return value;
+		}
+		
+		/**
+		 * Returns the type of the operand
+		 * @return 0 if a register index, otherwise a 1 if a literal
+		 */
+		public int getType()
+		{
+			return type; 
+		}
+	}
+	
 	public Hardware()
 	{
 		registerMap = new HashMap<String, Integer>();
@@ -161,37 +201,131 @@ public class Hardware
 		return result;
 	}
 	
-	private int store(String r, String location)
+	/**
+	 * Stores the contents of op2 at the memory location indicated by op1
+	 * @param op1
+	 * @param op2
+	 * @return
+	 */
+	private int store(Operand op1, Operand op2)
 	{
+		// TODO - error checking to prevent exceptions
 		
-		
-		return 0;
+		if (op1.getType() == 0)
+		{
+			memory[registers[op1.getValue()]] = registers[op2.getValue()];
+			return 1;
+		}
+		else
+		{
+			memory[registers[op1.getValue()]] = op2.getValue();
+			return 1;
+		}		
 	}
 	
+	/**
+	 * Takes two operands as input; loads the value represented by op2 into op1
+	 * @param op1
+	 * @param op2
+	 * @return
+	 */
+	private int load(Operand op1, Operand op2)
+	{
+		if (op1.getType() != 0)
+		{
+			return 0;
+		}
+		
+		if (op2.getType() == 0)
+		{
+			registers[op1.getValue()] = memory[registers[op2.getValue()]];
+			return 1;
+		}
+		else
+		{
+			registers[op1.getValue()] = memory[op2.getValue()];
+			return 1;
+		}
+	}
+	
+	/**
+	 * Takes an array of strings as input. If the string sequence makes a valid instruction,
+	 * executes the instruction and returns 1; else returns 0
+	 * @param instString The array of strings representing the instruction
+	 * @return 0 if fail, 1 if successful
+	 */
 	public int executeInstruction(String[] instString)
 	{
 		// Check the command and execute appropriately
-		String op = instString[0];
-		int[] registerIndices;
+		String operation = instString[0];
+		Operand op1, op2, op3;
 		
-		if (!op.equals("store") && !op.equals("load"))
+		op1 = parseOperand(instString[1]);
+		op2 = parseOperand(instString[2]);
+		
+		// if op1 or op2 are null, then the instruction is not valid
+		if (op1 == null || op2 == null)
 		{
-			registerIndices = new int[instString.length-1];
-			for (int i = 1; i < instString.length; i++)
+			return 0;
+		}
+		
+		// store and load have fewer arguments, so we handle them first
+		if (operation.equals("load"))
+		{
+			// if op1 is not a register, then the load is bad
+			if (op1.type != 0)
 			{
-				registerIndices[i-1] = registerMap.get(instString[i]);
+				return 0;
 			}
 			
-			// execute the op
+			this.load(op1, op2);
+		}
+		else if (operation.equals("store"))
+		{
+			// if op2 is not a register, then we're storing from nowhere
+			if (op2.getType() != 0)
+			{
+				return 0;
+			}
 			
-		} else {
-			registerIndices = new int[1];
-			registerIndices[0] = registerMap.get(instString[1]);
+			this.store(op1, op2);
+		}
+		else
+		{
+			op3 = parseOperand(instString[3]);
 			
-			// execute the store or load
 		}
 		
 		return 0;
+	}
+
+	/**
+	 * Parses the operand - detects if it's a register and parses it that way.
+	 * If unsuccessful, tries to parse it as an integer. If that's unsuccessful,
+	 * returns null.
+	 * @param op
+	 * @return an operand object representing the parse value. Otherwise, returns a null
+	 */
+	private Operand parseOperand(String op)
+	{
+		Integer value = this.registerMap.get(op);
+		
+		if (value == null)
+		{
+			// the value should be an integer
+			try 
+			{
+				value = Integer.parseInt(op);
+				
+				return (new Operand(value, 1));
+			} catch (IllegalArgumentException e)
+			{
+				// the value was not an integer
+				return null;
+			}
+		}
+		
+		return (new Operand(value, 0));
 	}
 	
 	public void testOr()
