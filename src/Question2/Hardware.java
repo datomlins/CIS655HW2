@@ -157,11 +157,22 @@ public class Hardware
 	 * @param r the register begin modified
 	 * @return the resultant integer
 	 */
-	private int shiftl(String r)
+	private int shiftl(Operand op1, Operand op2)
 	{
-		int num = registers[registerMap.get(r)];
-		// TODO - add trim
-		return (num << 1);
+		int resIdx = op1.getValue();
+		
+		if (op2.getType() == 0)
+		{
+			registers[resIdx] = registers[op2.getValue()] << 1;
+			
+			return 1;
+		}
+		else
+		{
+			registers[resIdx] = op2.getValue() << 1;
+			
+			return 1;
+		}
 	}
 	
 	/**
@@ -172,43 +183,116 @@ public class Hardware
 	 * @param r the register begin modified
 	 * @return the resultant integer
 	 */
-	private int shiftr(String r)
+	private int shiftr(Operand op1, Operand op2)
 	{
-		int num = registers[registerMap.get(r)];
+		int resIdx = op1.getValue();
 		
-		// TODO - add trim
-		return (num >>> 1);
+		if (op2.getType() == 0)
+		{
+			registers[resIdx] = registers[op2.getValue()] >>> 1;
+			
+			return 1;
+		}
+		else
+		{
+			registers[resIdx] = op2.getValue() >>> 1;
+			
+			return 1;
+		}
 	}
 	
 	/** 
-	 * Performs bitwise or betweent the contents of the registers and returns
+	 * Performs bitwise or between the contents of the registers and returns
 	 * the results
 	 * @param r1 the string name for the first register
 	 * @param r2 the string name for the second register
 	 * @return the result of the bitwise operation
 	 */
-	private int or(String r1, String r2)
+	private int or(Operand op1, Operand op2, Operand op3)
 	{
-		int num1 = registers[registerMap.get(r1)];
-		int num2 = registers[registerMap.get(r2)];
+		int resIdx = op1.getValue();
 		
-		return (num1 | num2);
+		int num1, num2;
+		
+		if (op2.getType() == 0)
+		{
+			num1 = registers[op2.getValue()];
+		}
+		else
+		{
+			num1 = op2.getValue();
+		}
+		
+		if (op3.getType() == 0)
+		{
+			num2 = registers[op3.getValue()];
+		}
+		else
+		{
+			num2 = op3.getValue();
+		}
+		
+		registers[resIdx] = (num1 | num2);
+		
+		return 1;
 	}
 	
-	private int and(String r1, String r2)
+	private int and(Operand op1, Operand op2, Operand op3)
 	{
-		int num1 = registers[registerMap.get(r1)];
-		int num2 = registers[registerMap.get(r2)];
+		int resIdx = op1.getValue();
 		
-		return (num1 & num2);
+		int num1, num2;
+		
+		if (op2.getType() == 0)
+		{
+			num1 = registers[op2.getValue()];
+		}
+		else
+		{
+			num1 = op2.getValue();
+		}
+		
+		if (op3.getType() == 0)
+		{
+			num2 = registers[op3.getValue()];
+		}
+		else
+		{
+			num2 = op3.getValue();
+		}
+		
+		registers[resIdx] = (num1 & num2);
+		
+		return 1;
 	}
 	
-	private int xor(String r1, String r2)
+	private int xor(Operand op1, Operand op2, Operand op3)
 	{
-		int num1 = registers[registerMap.get(r1)];
-		int num2 = registers[registerMap.get(r2)];
+		int resIdx = op1.getValue();
 		
-		return (num1 ^ num2);
+		int num1, num2;
+		
+		if (op2.getType() == 0)
+		{
+			num1 = registers[op2.getValue()];
+		}
+		else
+		{
+			num1 = op2.getValue();
+		}
+		
+		if (op3.getType() == 0)
+		{
+			num2 = registers[op3.getValue()];
+		}
+		else
+		{
+			num2 = op3.getValue();
+		}
+		
+		registers[resIdx] = (num1 ^ num2);
+		
+		return 1;
 	}
 	
 	/**
@@ -217,11 +301,29 @@ public class Hardware
 	 * @param r2
 	 * @return
 	 */
-	private int crazy(String r1, String r2)
+	private int crazy(Operand op1, Operand op2, Operand op3)
 	{
-		String snum1 = Integer.toBinaryString(registers[registerMap.get(r1)]);
-		String snum2 = Integer.toBinaryString(registers[registerMap.get(r2)]);
+		int resIdx = op1.getValue();
+		String snum1, snum2;
 		
+		if (op2.getType() == 0)
+		{
+			snum1 = Integer.toBinaryString(registers[op2.getValue()]);
+		}
+		else
+		{
+			snum1 = Integer.toBinaryString(op2.getValue());
+		}
+		
+		if (op3.getType() == 0)
+		{
+			snum2 = Integer.toBinaryString(registers[op3.getValue()]);
+		}
+		else
+		{
+			snum2 = Integer.toBinaryString(op3.getValue());
+		}
+				
 		// if one of the strings is shorter, left pad it with 0s
 		if (snum1.length() < snum2.length())
 		{
@@ -245,9 +347,9 @@ public class Hardware
 			mergedString = mergedString.concat(snum1.substring(i,i+1) + snum2.substring(i,i+1));
 		}
 		
-		int result = Integer.parseInt(mergedString, 2);
+		registers[resIdx] = Integer.parseInt(mergedString, 2);
 		
-		return result;
+		return 1;
 	}
 	
 	/**
@@ -359,35 +461,33 @@ public class Hardware
 			}
 			else if (operation.equals("shiftl"))
 			{
-				
+				return this.shiftl(op1, op2);
 			}
 			else if (operation.equals("shiftr"))
 			{
-				
+				return this.shiftr(op1, op2);
 			}
 			else if (operation.equals("or"))
 			{
-				
+				return this.or(op1, op2, op3);
 			}
 			else if (operation.equals("xor"))
 			{
-				
+				return this.xor(op1, op2, op3);
 			}
 			else if (operation.equals("and"))
 			{
-				
+				return this.and(op1, op2, op3);
 			}
 			else if (operation.equals("weave"))
 			{
-				
+				return this.crazy(op1, op2, op3);
 			}
 			else
 			{
 				return 0;
 			}
 		}
-		
-		return 0;
 	}
 
 	/**
