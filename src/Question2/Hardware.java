@@ -6,9 +6,11 @@ public class Hardware
 {
 	private HashMap<String, Integer> registerMap;
 	private static final String[] registerNames = {"r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"};
-	private int[] memory;
-	private int[] registers;
-	private static final int REGISTER_SIZE = 8; // TODO - maybe just get rid of this
+	private int[] memory; // array representing random access memory/cache
+	private int[] registers; // array representing the values in different registers
+		
+	private static final int REGISTER_SIZE = 32; // TODO - maybe just get rid of this
+	private static final int MEMORY_SIZE = 1024;
 	
 	public Hardware()
 	{
@@ -20,23 +22,28 @@ public class Hardware
 		}
 		
 		registers = new int[registerNames.length];
-		memory = new int[1024];
+		memory = new int[MEMORY_SIZE];
 	}
 	
 	
 	/**
-	 * Adds the contents of r1 and r2. Leaves checking r1 and r2 to the
-	 * calling method
-	 * @param r1 The first register being added
-	 * @param r2 The second register being added
-	 * @return the sum of the contents of r1 and r2
+	 * Adds the contents of r2 and r3 and puts them in r1. 
+	 * @param r1 The destination register
+	 * @param r2 The first register being added
+	 * @param r3 The second register being added
+	 * @return 1 if successful, else 0
 	 */
-	private int addRegisters(String r1, String r2)
+	private int addRegisters(int r1_idx, int r2_idx, int r3_idx)
 	{
-		int r1_num = registerMap.get(r1);
-		int r2_num = registerMap.get(r2);
-		
-		return (registers[r1_num] + registers[r2_num]);
+		try 
+		{
+			registers[r1_idx] = registers[r2_idx] + registers[r3_idx];
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return 0;
+		}
 	}
 	
 	/**
@@ -154,6 +161,38 @@ public class Hardware
 		return result;
 	}
 	
+	private int store(String r, String location)
+	{
+		
+		
+		return 0;
+	}
+	
+	public int executeInstruction(String[] instString)
+	{
+		// Check the command and execute appropriately
+		String op = instString[0];
+		int[] registerIndices;
+		
+		if (!op.equals("store") && !op.equals("load"))
+		{
+			registerIndices = new int[instString.length-1];
+			for (int i = 1; i < instString.length; i++)
+			{
+				registerIndices[i-1] = registerMap.get(instString[i]);
+			}
+			
+			// execute the op
+			
+		} else {
+			registerIndices = new int[1];
+			registerIndices[0] = registerMap.get(instString[1]);
+			
+			// execute the store or load
+		}
+		
+		return 0;
+	}
 	
 	public void testOr()
 	{
