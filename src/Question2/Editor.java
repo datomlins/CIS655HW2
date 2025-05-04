@@ -58,14 +58,28 @@ public class Editor
 		
 		
 		// add a space to show results
-		JLabel label = new JLabel("Current Register State: " + cpu.toString());
+		JLabel registers = new JLabel("Current Register State: " + cpu.toString());
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 4;
 		c.gridy = 0;
-		pane.add(label, c);
+		pane.add(registers, c);
 		
 		// add a button to execute code
 		JButton executeButton = new JButton("Execute");
+		executeButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				try {
+					// TODO - execute whatever is in the codeSpace
+					
+					// TODO - set the text in label
+				} catch (Exception e) {
+					registers.setText("Error");
+				}
+			}
+		});
+		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 2;
 		c.gridy = 5;
