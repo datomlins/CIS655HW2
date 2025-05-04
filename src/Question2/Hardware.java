@@ -530,6 +530,8 @@ public class Hardware
 								registers[registerMap.get(registerNames[i])] + "; ");
 		}
 		
+		System.out.println(this.toString());
+		
 		System.out.println();
 	}
 	
@@ -560,4 +562,20 @@ public class Hardware
 		System.out.println("Post-op:");
 		printRegisters(); // should be 42 in r3
 	}
+
+	@Override
+	public String toString()
+	{
+		// print the registers and their contents; ugly is fine for now.
+		StringBuilder result = new StringBuilder();
+		
+		for (int i = 0; i < registerNames.length; i++)
+		{
+			result.append((registerNames[i] + ":" + 
+								registers[registerMap.get(registerNames[i])] + "; "));
+		}
+		
+		return result.toString();
+	}
+	
 }
