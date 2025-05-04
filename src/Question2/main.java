@@ -7,10 +7,11 @@ public class main
 	{
 		Hardware cpu1 = new Hardware();
 		Interpreter interp = new Interpreter();
+		Editor editor = new Editor();
+		
 		
 		// cpu1.testOr();
-		
-		System.out.println(interp.interpret("store r2 r1"));
+		//System.out.println(interp.interpret("store r2 r1"));
 		
 		
 	}
