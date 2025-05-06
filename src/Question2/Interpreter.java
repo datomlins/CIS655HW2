@@ -97,8 +97,12 @@ public class Interpreter
 			result.append(op3);
 			
 		}
-		
-		return (result.toString());
+
+		String binaryString = result.toString();
+		int decimal = Integer.parseUnsignedInt(binaryString, 2);
+		String hexString = String.format("%08X", decimal); // 8-digit uppercase hex
+		return hexString;
+
 	}
 	
 	/**

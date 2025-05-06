@@ -16,7 +16,7 @@ public class Hardware
 	{
 		private int value; 
 		private int type; // 0 for register, 1 for literal (i.e. an int)
-		
+
 		/**
 		 * Constructs an operand for use in parsing
 		 * @param val The value of the operand - a literal or the register index
@@ -63,6 +63,10 @@ public class Hardware
 		
 		registers = new int[registerNames.length];
 		memory = new int[MEMORY_SIZE];
+
+		memory[0] = 42;   // r1 = memory[0] → 42
+		memory[10] = 7;   // r2 = memory[10] → 7
+		memory[5] = 100;  // optional
 	}
 	
 	
@@ -561,6 +565,32 @@ public class Hardware
 		this.crazy(op3, op1, op2);
 		System.out.println("Post-op:");
 		printRegisters(); // should be 42 in r3
+	}
+
+	public String executeAndReport(String instructionLine, Interpreter interp) {
+		String[] parts = instructionLine.trim().split("\\s+");
+		String opcode = interp.interpret(instructionLine);
+		if (opcode == null) {
+			return "Invalid instruction: " + instructionLine;
+		}
+
+		String before = this.toString();  // Register state before
+
+		int result = this.executeInstruction(parts);
+
+		String after = this.toString();   // Register state after
+
+		StringBuilder memoryDump = new StringBuilder();
+		memoryDump.append("Memory Snapshot:\n");
+		for (int i = 0; i < 8; i++) {  // Limit to first few cells for readability
+			memoryDump.append("[").append(i).append("] = ").append(memory[i]).append("; ");
+		}
+
+		return  "Instruction: " + instructionLine + "\n" +
+				"Opcode (hex): " + opcode + "\n" +
+				"Registers Before: " + before + "\n" +
+				"Registers After:  " + after + "\n" +
+				memoryDump.toString() + "\n";
 	}
 
 	@Override
