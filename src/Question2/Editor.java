@@ -24,9 +24,10 @@ public class Editor
 	private void createAndShowGUI()
 	{
 		// make the frame
-		JFrame frame = new JFrame("This is a test because I don't remember how to GUI");
+		JFrame frame = new JFrame("Instruction Set Interpreter");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		frame.setPreferredSize(new Dimension(1000, 600));
+
 		// set up the content pane
 		addComponentsToGUI(frame.getContentPane());
 		
@@ -37,6 +38,9 @@ public class Editor
 	
 	private void addComponentsToGUI(Container pane)
 	{
+		pane.setPreferredSize(new Dimension(1000, 600));
+		pane.setBackground(Color.LIGHT_GRAY);
+
 		if (RIGHT_TO_LEFT)
 		{
 			pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
@@ -51,38 +55,62 @@ public class Editor
 		
 		// add a space to write code
 		JTextArea codeSpace = new JTextArea(10, 20);
-		c.fill = GridBagConstraints.HORIZONTAL;
+		JScrollPane scrollPane = new JScrollPane(codeSpace);
 		c.gridx = 0;
 		c.gridy = 0;
-		pane.add(codeSpace, c);
-		
-		
+		c.gridheight = 5;  // leave space for the button
+		c.fill = GridBagConstraints.BOTH;
+		scrollPane.setBorder(BorderFactory.createTitledBorder("Code Input"));
+		pane.add(scrollPane, c);
+
+
 		// add a space to show results
-		JLabel registers = new JLabel("Current Register State: " + cpu.toString());
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 4;
+		JTextArea outputArea = new JTextArea(25, 60);
+		outputArea.setLineWrap(true);
+		outputArea.setWrapStyleWord(true);
+		outputArea.setEditable(false);
+		outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+		JScrollPane outputScrollPane = new JScrollPane(outputArea);
+		c.gridx = 1;
 		c.gridy = 0;
-		pane.add(registers, c);
+		c.gridheight = 6;
+		c.fill = GridBagConstraints.BOTH;
+		outputScrollPane.setBorder(BorderFactory.createTitledBorder("Execution Output"));
+		pane.add(outputScrollPane, c);
 		
 		// add a button to execute code
 		JButton executeButton = new JButton("Execute");
-		executeButton.addActionListener(new ActionListener()
-		{
+		executeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				try {
-					// TODO - execute whatever is in the codeSpace
-					
-					// TODO - set the text in label
+					String code = codeSpace.getText();
+					String[] lines = code.split("\\n");
+					StringBuilder output = new StringBuilder();
+
+					for (String line : lines) {
+						String result = cpu.executeAndReport(line.trim(), interp);
+						output.append(result).append("\n\n");
+					}
+
+					String formatted = "Output:\n"
+							+ output.toString()
+							+ "\n\nCurrent Register State:\n"
+							+ cpu.toString();
+
+					outputArea.setText(formatted);
 				} catch (Exception e) {
-					registers.setText("Error");
+					outputArea.setText("Error: " + e.getMessage());
 				}
 			}
 		});
-		
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 2;
+
+		c.gridx = 0;
 		c.gridy = 5;
+		c.gridheight = 1;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.CENTER;
 		pane.add(executeButton, c);
 	}
 }
